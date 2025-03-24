@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure API Client</title>
+    <style>
+        /* CSS Styles (Presentation Layer) */
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        .result-container, .error-container {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 4px;
+            display: none;
+        }
+
+        .result-container {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .error-container {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .logs {
+            margin-top: 30px;
+        }
+
+        .log-container {
+            height: 200px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border-radius: 4px;
+        }
+
+        .log-entry {
+            margin-bottom: 5px;
+            padding: 5px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .log-info {
+            color: #17a2b8;
+        }
+
+        .log-error {
+            color: #dc3545;
+        }
+
+        .log-success {
+            color: #28a745;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Secure API Client</h1>
+        
+        <form id="apiForm">
+            <div class="form-group">
+                <label for="taxId">Tax ID:</label>
+                <input type="text" id="taxId" required value="20155945860">
+            </div>
+            
+            <div class="form-group">
+                <label for="user">User:</label>
+                <input type="text" id="user" required value="20185555">
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" id="password" required value="daniel1706">
+            </div>
+            
+            <div class="form-group">
+                <label for="phone">Phone:</label>
+                <input type="text" id="phone" required value="932490643">
+            </div>
+            
+            <div class="form-group">
+                <label for="ip">IP:</label>
+                <input type="text" id="ip" required value="192.168.1.100">
+            </div>
+            
+            <div class="form-group">
+                <label for="dateTime">Date Time:</label>
+                <input type="text" id="dateTime" required value="20250320 01:42:15AM">
+            </div>
+            
+            <button type="submit">Send Encrypted Payload</button>
+        </form>
+        
+        <div id="result" class="result-container"></div>
+        <div id="error" class="error-container"></div>
+        
+        <div class="logs">
+            <h3>Logs:</h3>
+            <div id="logs" class="log-container"></div>
+        </div>
+    </div>
+
+    <script>
+        // ==============================================
+        // DOMAIN LAYER - Business logic and entities
+        // ==============================================
+        class ApiPayload {
+            constructor(taxId, user, password, phone, ip, dateTime) {
+                this.TaxId = taxId;
+                this.User = user;
+                this.Password = password;
+                this.Phone = phone;
+                this.IP = ip;
+                this.DateTime = dateTime;
+            }
+
+            toJSON() {
+                return {
+                    TaxId: this.TaxId,
+                    User: this.User,
+                    Password: this.Password,
+                    Phone: this.Phone,
+                    IP: this.IP,
+                    DateTime: this.DateTime
+                };
+            }
+        }
+
+        // ==============================================
+        // APPLICATION LAYER - Use cases and business operations
+        // ==============================================
+        // Interfaces
+        class IApiService {
+            async sendEncryptedPayload(payload) {
+                throw new Error('Method not implemented');
+            }
+        }
+
+        // Services
+        class ApiService extends IApiService {
+            constructor(encryptionService, httpService) {
+                super();
+                this.encryptionService = encryptionService;
+                this.httpService = httpService;
+            }
+
+            async sendEncryptedPayload(payload) {
+                const jsonPayload = JSON.stringify(payload);
+                const encryptedPayload = this.encryptionService.encrypt(jsonPayload);
+                
+                const requestBody = { data: encryptedPayload };
+                await this.httpService.post(requestBody);
+            }
+        }
+
+        // ==============================================
+        // INFRASTRUCTURE LAYER - Technical implementations
+        // ==============================================
+        // Interfaces
+        class IEncryptionService {
+            encrypt(plainText) {
+                throw new Error('Method not implemented');
+            }
+        }
+
+        class IHttpService {
+            async post(body) {
+                throw new Error('Method not implemented');
+            }
+        }
+
+        // Services
+        class EncryptionService extends IEncryptionService {
+            constructor(encryptionKey) {
+                super();
+                if (encryptionKey.length !== 32) {
+                    throw new Error('La clave de encriptación debe tener 32 caracteres.');
+                }
+                this.encryptionKey = encryptionKey;
+            }
+
+            encrypt(plainText) {
+                // Note: This is a simulation. In production, use a real crypto library
+                console.log(`Encrypting with key: ${this.encryptionKey}`);
+                
+                // Simulated encryption
+                const iv = this.generateIV();
+                const encrypted = btoa(encodeURIComponent(plainText).split('').map(
+                    (char, i) => String.fromCharCode(char.charCodeAt(0) + 
+                    this.encryptionKey.charCodeAt(i % this.encryptionKey.length) + 
+                    iv.charCodeAt(i % iv.length))
+                ).join(''));
+                
+                return `${iv}:${encrypted}`;
+            }
+
+            generateIV() {
+                // Generate a 16-character IV
+                return Array.from({length: 16}, () => 
+                    Math.floor(Math.random() * 16).toString(16)).join('');
+            }
+        }
+
+        class HttpService extends IHttpService {
+            constructor(apiUrl) {
+                super();
+                this.apiUrl = apiUrl;
+            }
+
+            async post(body) {
+                try {
+                    // In a real application, this would make an actual HTTP request
+                    console.log('Simulating HTTP POST to:', this.apiUrl, 'with body:', body);
+                    
+                    // Simulate network delay
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                    
+                    // Simulate successful response
+                    return { success: true, data: body };
+                } catch (error) {
+                    console.error('Error in HTTP request:', error);
+                    throw error;
+                }
+            }
+        }
+
+        // ==============================================
+        // SHARED LAYER - Common utilities
+        // ==============================================
+        class StringExtensions {
+            static isBase64(input) {
+                try {
+                    return btoa(atob(input)) === input;
+                } catch (e) {
+                    return false;
+                }
+            }
+        }
+
+        // Extend String prototype
+        String.prototype.isBase64 = function() {
+            return StringExtensions.isBase64(this);
+        };
+
+        // ==============================================
+        // PRESENTATION LAYER - User interface
+        // ==============================================
+        // Logger
+        class Logger {
+            static log(message, type = 'info') {
+                const logElement = document.getElementById('logs');
+                const logEntry = document.createElement('div');
+                logEntry.className = `log-entry log-${type}`;
+                logEntry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+                logElement.appendChild(logEntry);
+                logElement.scrollTop = logElement.scrollHeight;
+                
+                // Also log to console for debugging
+                console.log(`[${type.toUpperCase()}] ${message}`);
+            }
+        }
+
+        // Application configuration
+        const config = {
+            apiUrl: 'https://api.example.com/endpoint',
+            encryptionKey: 'abcdefghijklmnopqrstuvwxyz123456' // 32 characters
+        };
+
+        // Initialize services with Dependency Injection
+        const encryptionService = new EncryptionService(config.encryptionKey);
+        const httpService = new HttpService(config.apiUrl);
+        const apiService = new ApiService(encryptionService, httpService);
+
+        // Form handler
+        document.getElementById('apiForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            // Clear previous results
+            document.getElementById('result').style.display = 'none';
+            document.getElementById('error').style.display = 'none';
+            
+            try {
+                Logger.log('Starting payload sending process...');
+                
+                // Create payload from form
+                const payload = new ApiPayload(
+                    document.getElementById('taxId').value,
+                    document.getElementById('user').value,
+                    document.getElementById('password').value,
+                    document.getElementById('phone').value,
+                    document.getElementById('ip').value,
+                    document.getElementById('dateTime').value
+                );
+                
+                Logger.log(`Payload created: ${JSON.stringify(payload.toJSON())}`);
+                
+                // Send encrypted payload
+                await apiService.sendEncryptedPayload(payload);
+                
+                // Show success
+                const resultElement = document.getElementById('result');
+                resultElement.textContent = 'Payload sent successfully! Check console for details.';
+                resultElement.style.display = 'block';
+                
+                Logger.log('Payload sent successfully', 'success');
+            } catch (error) {
+                console.error('Error:', error);
+                
+                // Show error
+                const errorElement = document.getElementById('error');
+                errorElement.textContent = `Error: ${error.message}`;
+                errorElement.style.display = 'block';
+                
+                Logger.log(`Error: ${error.message}`, 'error');
+            }
+        });
+
+        // Initial log
+        Logger.log('Application initialized and ready');
+    </script>
+</body>
+</html>
