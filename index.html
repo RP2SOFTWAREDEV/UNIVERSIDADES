@@ -246,13 +246,6 @@
                 const user = document.getElementById('user').value.trim();
                 const password = document.getElementById('password').value.trim();
                 
-                // Verificación específica para adolfolopez/1234
-                if(user === 'adolfolopez' && password === '1234') {
-                    // Redirigir directamente a dashboard.html
-                    window.location.href = 'dashboard.html';
-                    return;
-                }
-                
                 if(!user || !password) {
                     loading.style.display = 'none';
                     errorMessage.textContent = 'Usuario y contraseña son requeridos';
@@ -294,7 +287,7 @@
                         
                         // Redirigir (simulado)
                         setTimeout(() => {
-                            window.location.href = 'https://imprime.pucp.edu.pe/dashboard';
+                            window.location.href = 'dashboard.html';
                         }, 1000);
                     } else {
                         registerModal.style.display = 'flex';
